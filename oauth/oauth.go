@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/mercadolibre/golang-restlient/rest"
@@ -38,6 +39,28 @@ func IsPublic(req *http.Request) bool {
 	return req.Header.Get(headerXPublic) == "true"
 }
 
+func GetCallerId(req *http.Request) int64 {
+	if req == nil {
+		return 0
+	}
+	callerID, err := strconv.ParseInt(req.Header.Get(headerXCallerID), 10, 64)
+	if err != nil {
+		return 0
+	}
+	return callerID
+}
+
+func GetClientId(req *http.Request) int64 {
+	if req == nil {
+		return 0
+	}
+	clientID, err := strconv.ParseInt(req.Header.Get(headerXClientID), 10, 64)
+	if err != nil {
+		return 0
+	}
+	return clientID
+}
+
 // AuthenticateRequest authenticates the requests
 func AuthenticateRequest(req *http.Request) *errors.RestErr {
 	if req == nil {
@@ -59,6 +82,8 @@ func AuthenticateRequest(req *http.Request) *errors.RestErr {
 
 	req.Header.Add(headerXClientID, fmt.Sprintf("%v", at.ClientID))
 	req.Header.Add(headerXCallerID, fmt.Sprintf("%v", at.UserID))
+
+	return nil
 }
 
 func cleanRequest(req *http.Request) {
